@@ -22,7 +22,11 @@ use App\Http\Controllers\API\TagController;
 */
 Route::post('login', [UserController::class, 'signin']);
 
-
+Route::middleware('auth:clients')->group( function () {
+    Route::get('/ok',function(){
+        return "OK";
+    });
+});
 Route::middleware('auth:sanctum')->group( function () {
     //users route
     Route::resource('users',UserController::class);

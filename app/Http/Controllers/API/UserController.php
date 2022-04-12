@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Validator;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Client;
+use Illuminate\Support\Facades\Hash;
+
 class UserController extends BaseController
 {
  
@@ -16,7 +19,7 @@ class UserController extends BaseController
     //user login
     public function signin(Request $request)
     {
-        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){ 
+        /*if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){ 
             $authUser = Auth::user(); 
             $success['token'] =  $authUser->createToken('MyAuthApp')->plainTextToken; 
             $success['name'] =  $authUser->name;
@@ -26,6 +29,16 @@ class UserController extends BaseController
         else{ 
             return $this->sendError('Unauthorised.', ['error'=>'Unauthorised']);
         } 
+        */
+        $client = Client::where('email', $request->email)->first();
+
+        if ( !$client || ! Hash::check($request->password, $client->password)){ 
+            
+            return $this->sendError('Unauthorised.',401);  
+         } 
+        $success['token'] =  $client->createToken('token')->plainTextToken; 
+        $success['name'] =  $client->fname.' '.$client->lname;
+        return $this->sendResponse($success, 'client signed in');
     }
     /**
      * Store a newly created resource in storage.
